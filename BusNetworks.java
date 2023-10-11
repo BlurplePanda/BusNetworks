@@ -97,8 +97,11 @@ public class BusNetworks {
         }
         else {
             UI.println("\nFrom "+town.getName()+" you can get to:");
-            /*# YOUR CODE HERE */
-
+            Set<Town> reachable = findAllConnected(town);
+            reachable.remove(town);
+            for (Town t : reachable) {
+                UI.println(t);
+            }
         }
 
     }
