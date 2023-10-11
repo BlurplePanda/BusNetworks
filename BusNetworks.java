@@ -78,11 +78,10 @@ public class BusNetworks {
     }
 
     public void findConnected(Town town, Set<Town> connected) {
+        if (connected.contains(town)) { return; }
         connected.add(town);
         for (Town neighbour : town.getNeighbours()) {
-            if (!connected.contains(neighbour)) {
-                findConnected(neighbour, connected);
-            }
+            findConnected(neighbour, connected);
         }
     }
 
