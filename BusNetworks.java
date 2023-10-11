@@ -3,9 +3,9 @@
 // You may not distribute it in any other way without permission.
 
 /* Code for COMP103 - 2023T2, Assignment 6
- * Name:
- * Username:
- * ID:
+ * Name: Amy Booth
+ * Username: boothamy
+ * ID: 300653766
  */
 
 import ecs100.*;
@@ -31,7 +31,18 @@ public class BusNetworks {
             UI.clearText();
             List<String> lines = Files.readAllLines(Path.of(filename));
             String firstLine = lines.remove(0);
-            /*# YOUR CODE HERE */
+            Scanner names = new Scanner(firstLine);
+            while (names.hasNext()) {
+                String name = names.next();
+                busNetwork.put(name, new Town(name));
+            }
+            for (String line : lines) {
+                Scanner sc = new Scanner(line);
+                Town town1 = busNetwork.get(sc.next());
+                Town town2 = busNetwork.get(sc.next());
+                town1.addNeighbour(town2);
+                town2.addNeighbour(town1);
+            }
 
             UI.println("Loaded " + busNetwork.size() + " towns:");
 
@@ -45,7 +56,13 @@ public class BusNetworks {
      */
     public void printNetwork() {
         UI.println("The current network: \n====================");
-        /*# YOUR CODE HERE */
+        for (Town town : busNetwork.values()) {
+            String print = town.getName()+"->";
+            for (Town neighbour : town.getNeighbours()) {
+                print += " "+neighbour.getName();
+            }
+            UI.println(print);
+        }
 
     }
 
@@ -56,7 +73,7 @@ public class BusNetworks {
      */
     public Set<Town> findAllConnected(Town town) {
         /*# YOUR CODE HERE */
-
+        return null;
     }
 
     /**  COMPLETION
