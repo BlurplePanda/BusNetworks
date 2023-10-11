@@ -115,8 +115,17 @@ public class BusNetworks {
     public void printConnectedGroups() {
         UI.println("Groups of Connected Towns: \n================");
         int groupNum = 1;
-        /*# YOUR CODE HERE */
-
+        List<Town> toCheck = new ArrayList<>(busNetwork.values());
+        while (!toCheck.isEmpty()) {
+            Set<Town> found = findAllConnected(toCheck.get(0));
+            toCheck.removeAll(found);
+            UI.printf("Group %d:", groupNum);
+            for (Town town : found) {
+                UI.print(" "+town.getName());
+            }
+            UI.println();
+            groupNum++;
+        }
     }
 
     /**
