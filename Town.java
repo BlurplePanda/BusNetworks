@@ -11,6 +11,7 @@
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import ecs100.*;
 
 public class Town {
@@ -22,8 +23,8 @@ public class Town {
 
     public Town(String name) {
         this.name = name;
-        x = Double.NEGATIVE_INFINITY;
-        y = Double.NEGATIVE_INFINITY;
+        x = Double.NEGATIVE_INFINITY; // shouldn't display if no lat/lon entered
+        y = Double.NEGATIVE_INFINITY; // but also won't throw error this way :)
     }
 
     public Town(String name, double lat, double lon) {
@@ -44,8 +45,8 @@ public class Town {
         neighbours.add(node);
     }
 
-    public String toString(){
-        return name+" ("+neighbours.size()+" connections)";
+    public String toString() {
+        return name + " (" + neighbours.size() + " connections)";
     }
 
 }
