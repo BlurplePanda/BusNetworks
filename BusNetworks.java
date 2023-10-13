@@ -9,9 +9,12 @@
  */
 
 import ecs100.*;
+
+import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.nio.file.*;
+import java.util.List;
 
 public class BusNetworks {
 
@@ -32,9 +35,23 @@ public class BusNetworks {
             List<String> lines = Files.readAllLines(Path.of(filename));
             String firstLine = lines.remove(0);
             Scanner names = new Scanner(firstLine);
-            while (names.hasNext()) {
-                String name = names.next();
-                busNetwork.put(name, new Town(name));
+            if (names.hasNextInt()) {
+                int numLines = names.nextInt();
+                for (int i = 0; i < numLines; i++) {
+                    Scanner sc = new Scanner(lines.get(i));
+                    String name = sc.next();
+                    double lat = sc.nextDouble();
+                    double lon = sc.nextDouble();
+                    busNetwork.put(name, new Town(name, lat, lon));
+                }
+                lines = lines.subList(numLines, lines.size());
+                convertXY();
+            }
+            else {
+                while (names.hasNext()) {
+                    String name = names.next();
+                    busNetwork.put(name, new Town(name));
+                }
             }
             for (String line : lines) {
                 Scanner sc = new Scanner(line);
@@ -43,6 +60,9 @@ public class BusNetworks {
                 town1.addNeighbour(town2);
                 town2.addNeighbour(town1);
             }
+
+            UI.setColor(Color.black);
+            displayNetwork();
 
             UI.println("Loaded " + busNetwork.size() + " towns:");
 
@@ -128,18 +148,77 @@ public class BusNetworks {
         }
     }
 
+    public void convertXY() {
+        double maxX = 300;
+        double maxY = 500;
+        double minX = 50;
+        double minY = 50;
+        double maxLat = Double.NEGATIVE_INFINITY;
+        double maxLon = Double.NEGATIVE_INFINITY;
+        double minLat = Double.POSITIVE_INFINITY;
+        double minLon = Double.POSITIVE_INFINITY;
+        for (Town town : busNetwork.values()) {
+            if (Math.abs(town.y) > maxLat) { maxLat = Math.abs(town.y); }
+            if (Math.abs(town.y) < minLat) { minLat = Math.abs(town.y); }
+            if (town.x > maxLon) { maxLon = town.x; }
+            if (town.x < minLon) { minLon = town.x; }
+        }
+
+        double shiftLat = (minY * maxLat - minLat * maxY)/(minY - maxY);
+        double shiftLon = (minX * maxLon - minLon * maxX)/(minX - maxX);
+        double scaleLat = (maxY - minY)/(maxLat - minLat);
+        double scaleLon = (maxX - minX)/(maxLon - minLon);
+
+        for (Town town : busNetwork.values()) {
+            double lat = Math.abs(town.y);
+            double lon = town.x;
+            town.y = scaleLat * (lat - shiftLat);
+            town.x = scaleLon * (lon - shiftLon);
+        }
+    }
+
+    public void displayTown(Town town, double radius) {
+        UI.fillOval(town.x-radius, town.y-radius, 2 * radius, 2 * radius);
+        for (Town neighbour : town.getNeighbours()) {
+            UI.drawLine(town.x, town.y, neighbour.x, neighbour.y);
+        }
+    }
+
+    public void displayNetwork() {
+        UI.clearGraphics();
+        UI.setColor(Color.black);
+        UI.setLineWidth(1);
+        for (Town town : busNetwork.values()) {
+            displayTown(town, 5);
+        }
+    }
+
+    public void doMouse(String action, double x, double y) {
+        if (action.equals("released")) {
+            for (Town town : busNetwork.values()) {
+                if (Math.abs(town.x-x) <= 5 && Math.abs(town.y-y) <= 5) {
+                    displayNetwork();
+                    UI.setColor(Color.red);
+                    UI.setLineWidth(3);
+                    displayTown(town, 7);
+                }
+            }
+        }
+    }
+
     /**
      * Set up the GUI (buttons and mouse)
      */
     public void setupGUI() {
+        UI.setMouseListener(this::doMouse);
         UI.addButton("Load", ()->{loadNetwork(UIFileChooser.open());});
         UI.addButton("Print Network", this::printNetwork);
         UI.addTextField("Reachable from", this::printReachable);
         UI.addButton("All Connected Groups", this::printConnectedGroups);
-        UI.addButton("Clear", UI::clearText);
+        UI.addButton("Clear text", UI::clearText);
         UI.addButton("Quit", UI::quit);
-        UI.setWindowSize(1100, 500);
-        UI.setDivider(1.0);
+        UI.setWindowSize(1100, 700);
+        UI.setDivider(0.5);
         loadNetwork("data-small.txt");
     }
 

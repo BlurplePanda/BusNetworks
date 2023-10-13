@@ -17,9 +17,19 @@ public class Town {
 
     private String name;
     private Set<Town> neighbours = new HashSet<Town>();
+    public double x;
+    public double y;
 
     public Town(String name) {
         this.name = name;
+        x = Double.NEGATIVE_INFINITY;
+        y = Double.NEGATIVE_INFINITY;
+    }
+
+    public Town(String name, double lat, double lon) {
+        this.name = name;
+        this.y = lat;
+        this.x = lon;
     }
 
     public String getName() {
